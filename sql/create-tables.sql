@@ -1,14 +1,11 @@
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'admindb')
-BEGIN
-  CREATE DATABASE admindb;
-END;
-GO
+CREATE DATABASE IF NOT EXISTS admindb;
+CREATE DATABASE IF NOT EXISTS productdb;
 
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'productdb')
-BEGIN
-  CREATE DATABASE productdb;
-END;
-GO
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'webshopuser'@'%' WITH GRANT OPTION;
+
+USE webshop;
 
 CREATE TABLE category (
 	id INT NOT NULL AUTO_INCREMENT,
@@ -104,9 +101,3 @@ CREATE TABLE customer (
 	role INT NOT NULL,
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB;
-
-CREATE UNIQUE INDEX UK_mufchskagt7e1w4ksmt9lum5l ON customer (username ASC);
-
-CREATE INDEX FK74aoh99stptslhotgf41fitt0 ON customer (role ASC);
-
-CREATE INDEX FK1mtsbur82frn64de7balymq9s ON product (category_id ASC);
