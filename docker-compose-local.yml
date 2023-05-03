@@ -64,6 +64,19 @@ services:
         local_dev_net:
             aliases:
                 - web-shop-db-image-product
+  
+  web-shop-microservice-category:
+    build:
+      context: ./microservices/CategoryService
+      dockerfile: ./Dockerfile
+    ports:
+      - "8889:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image-category:3306/category
+    networks:
+      local_dev_net:
+          aliases:
+              - microservicecategory
 
 networks:
   local_dev_net:
