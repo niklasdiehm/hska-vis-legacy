@@ -1,15 +1,15 @@
 version: '3.2'
 services:
-  legacywebshop:
-    build:
-      context: ./
-      dockerfile: ./docker/Dockerfile
-    ports:
-      - "8888:8080"
-    networks:
-      local_dev_net:
-          aliases:
-              - legacywebshop
+#  legacywebshop:
+#    build:
+#      context: ./
+#      dockerfile: ./docker/Dockerfile
+#    ports:
+#      - "8888:8080"
+#    networks:
+#      local_dev_net:
+#          aliases:
+#              - legacywebshop
 
   web-shop-db-image:
     build:
@@ -77,6 +77,19 @@ services:
       local_dev_net:
           aliases:
               - microservicecategory
+
+  web-shop-microservice-product:
+    build:
+      context: ./microservices/ProductService
+      dockerfile: ./Dockerfile
+    ports:
+      - "8890:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image-product:3306/product
+    networks:
+      local_dev_net:
+        aliases:
+          - microserviceproduct
 
 networks:
   local_dev_net:
