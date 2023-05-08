@@ -1,6 +1,5 @@
 package com.hka.vslab.product.controller;
 
-import com.hka.vslab.product.managers.ProductManager;
 import com.hka.vslab.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,8 +9,48 @@ import com.hka.vslab.product.services.CategoryService;
 
 import java.util.List;
 
+class NewProductData {
+	private String name;
+	private Double price;
+	private String details;
+	private int categoryId;
+
+	public NewProductData() {
+	}
+
+	public NewProductData(String name, Double price, int categoryId) {
+		this.name = name;
+		this.price = price;
+		this.details = null;
+		this.categoryId = categoryId;
+	}
+
+	public NewProductData(String name, Double price, String details, int categoryId) {
+		this.name = name;
+		this.price = price;
+		this.details = details;
+		this.categoryId = categoryId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public String getDetails() {
+		return details;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+}
+
 @RestController
-public class ProductController implements ProductManager {
+public class ProductController {
 
 	@Autowired
 	private CategoryService categoryService;
@@ -23,43 +62,28 @@ public class ProductController implements ProductManager {
 		return "world";
 	}
 
-	@Override
 	@GetMapping("/products")
 	public List<Product> getProducts() {
 		return productService.getAll();
 	}
 
-	@Override
 	@GetMapping("/products/{id}")
 	public Product getProductById(@PathVariable("id") int id) {
 		return productService.getProduct(id);
 	}
 
-	@Override
 	@GetMapping("/products/{name}")
 	public Product getProductByName(@PathVariable("name") String name) {
 		return productService.getProductByName(name);
 	}
 
-	@Override
 	@PostMapping("/products")
-	public int addProduct(
-			@RequestBody String name,
-			@RequestBody double price,
-			@RequestBody int categoryId,
-			@RequestBody String details
-	) {
+	public int addProduct(@RequestBody NewProductData newProduct) {
 		int productId = -1;
-		Category category = categoryService.getCategory(categoryId);
+		Category category = categoryService.getCategory(newProduct.getCategoryId());
+		Product product = new Product(newProduct.getName(), newProduct.getPrice(), category, newProduct.getDetails());
 
 		if(category != null){
-			Product product;
-			if(details == null){
-				product = new Product(name, price, category);
-			} else{
-				product = new Product(name, price, category, details);
-			}
-
 			productService.addProduct(product);
 			productId = product.getId();
 		}
@@ -67,7 +91,6 @@ public class ProductController implements ProductManager {
 		return productId;
 	}
 
-	@Override
 	@GetMapping("/products/search")
 	public List<Product> getProductsForSearchValues(
 			@RequestParam("searchString") String searchValue,
@@ -77,14 +100,12 @@ public class ProductController implements ProductManager {
 		return productService.findProductsBySearch(searchValue, searchMinPrice, searchMaxPrice);
 	}
 
-	@Override
 	@DeleteMapping("/products/{id}")
 	public boolean deleteProductsByCategoryId(@PathVariable("id") int categoryId) {
 		Category category = categoryService.getCategory(categoryId);
 		return productService.deleteAllByCategory(category) > 0;
 	}
 
-	@Override
 	@DeleteMapping("/product/{id}")
 	public void deleteProductById(@PathVariable("id") int id) {
 		productService.delProduct(id);

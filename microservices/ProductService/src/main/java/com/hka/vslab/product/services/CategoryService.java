@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-@FeignClient(value = "category", url = "localhost:8889/")
+@FeignClient(value = "category", url = "microservicecategory:8080/")
 public interface CategoryService {
     @RequestMapping(method = RequestMethod.GET, value = "/categories")
     List<Category> getCategories();
