@@ -1,7 +1,7 @@
-package com.hka.vslab.product.model.database.dataobjects;
+package com.hka.vslab.product.model;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * This class contains details about products.
@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Product implements java.io.Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -26,8 +26,10 @@ public class Product implements java.io.Serializable {
 	@Column(name = "price")
 	private double price;
 
-	@Column(name="category")
-	private String category;
+
+	@ManyToOne
+	@JoinColumn(name = "category_id")
+	private Category category;
 
 	@Column(name = "details")
 	private String details;
@@ -35,13 +37,13 @@ public class Product implements java.io.Serializable {
 	public Product() {
 	}
 
-	public Product(String name, double price, String category) {
+	public Product(String name, double price, Category category) {
 		this.name = name;
 		this.price = price;
 		this.category = category;
 	}
 
-	public Product(String name, double price, String category, String details) {
+	public Product(String name, double price, Category category, String details) {
 		this.name = name;
 		this.price = price;
 		this.category = category;
@@ -72,11 +74,11 @@ public class Product implements java.io.Serializable {
 		this.price = price;
 	}
 
-	public String getCategory() {
+	public Category getCategory() {
 		return this.category;
 	}
 
-	public void setCategory(String category) {
+	public void setCategory(Category category) {
 		this.category = category;
 	}
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hka.vs.CategoryService.model.Category;
 import com.hka.vs.CategoryService.service.CategoryService;
@@ -34,7 +35,7 @@ public class CategoryServiceController {
     }
 
     @PostMapping("/categories")
-    public void addCategory(Category category) {
+    public void addCategory(@RequestBody Category category) {
         categoryService.addCategory(category);
     }
 
