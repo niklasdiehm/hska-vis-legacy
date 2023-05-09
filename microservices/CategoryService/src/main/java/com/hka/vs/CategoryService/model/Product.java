@@ -1,4 +1,4 @@
-package com.hka.vslab.product.model;
+package com.hka.vs.CategoryService.model;
 
 
 import jakarta.persistence.*;
