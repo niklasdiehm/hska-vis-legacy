@@ -81,7 +81,7 @@ public class ProductController {
 	public int addProduct(@RequestBody NewProductData newProduct) {
 		int productId = -1;
 		Category category = categoryService.getCategory(newProduct.getCategoryId());
-		Product product = new Product(newProduct.getName(), newProduct.getPrice(), category, newProduct.getDetails());
+		Product product = new Product(newProduct.getName(), newProduct.getPrice(), newProduct.getCategoryId(), newProduct.getDetails());
 
 		if(category != null){
 			productService.addProduct(product);
