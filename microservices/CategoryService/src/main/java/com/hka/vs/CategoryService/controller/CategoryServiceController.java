@@ -13,9 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.hka.vs.CategoryService.model.Category;
 import com.hka.vs.CategoryService.service.CategoryService;
 
+import com.hka.vs.CategoryService.model.Product;
+import com.hka.vs.CategoryService.service.ProductService;
+
 @RestController
 public class CategoryServiceController {
 
+    @Autowired
+    private ProductService productService;
     @Autowired
     private CategoryService categoryService;
 
@@ -40,12 +45,22 @@ public class CategoryServiceController {
     }
 
     @DeleteMapping("/categories")
-    public void delCategory(Category category) {
+    public void delCategory(@RequestBody Category category) throws RuntimeException {
+        List<Product> products = productService.getProductsByCategory(category.getId());
+
+        if (!products.isEmpty()) {
+            throw new RuntimeException("Category is not empty");
+        }
         categoryService.delCategory(category);
     }
 
     @DeleteMapping("/categories/{id}")
-    public void delCategoryById(@PathVariable(required = true, name = "id") int id) {
+    public void delCategoryById(@PathVariable(required = true, name = "id") int id) throws RuntimeException {
+        List<Product> products = productService.getProductsByCategory(id);
+
+        if (!products.isEmpty()) {
+            throw new RuntimeException("Category is not empty");
+        }
         categoryService.delCategory(id);
     }
 

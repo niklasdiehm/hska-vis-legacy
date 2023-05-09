@@ -9,6 +9,8 @@ import com.hka.vslab.product.services.CategoryService;
 
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
 class NewProductData {
 	private String name;
 	private Double price;
@@ -63,7 +65,10 @@ public class ProductController {
 	}
 
 	@GetMapping("/products")
-	public List<Product> getProducts() {
+	public List<Product> getProducts(@RequestParam(required = false) String categoryId) {
+		if (categoryId != null) {
+			return productService.getProductsByCategory(Integer.parseInt(categoryId));
+		}
 		return productService.getAll();
 	}
 
@@ -78,15 +83,16 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public int addProduct(@RequestBody NewProductData newProduct) {
-		int productId = -1;
+	public int addProduct(@RequestBody NewProductData newProduct) throws RuntimeException{
 		Category category = categoryService.getCategory(newProduct.getCategoryId());
-		Product product = new Product(newProduct.getName(), newProduct.getPrice(), newProduct.getCategoryId(), newProduct.getDetails());
 
-		if(category != null){
-			productService.addProduct(product);
-			productId = product.getId();
+		if (category == null) {
+			throw new RuntimeException("Category not found");
 		}
+
+		Product product = new Product(newProduct.getName(), newProduct.getPrice(), newProduct.getCategoryId(), newProduct.getDetails());
+		productService.addProduct(product);
+		int productId = product.getId();
 
 		return productId;
 	}
@@ -100,8 +106,8 @@ public class ProductController {
 		return productService.findProductsBySearch(searchValue, searchMinPrice, searchMaxPrice);
 	}
 
-	@DeleteMapping("/products/{id}")
-	public boolean deleteProductsByCategoryId(@PathVariable("id") int categoryId) {
+	@DeleteMapping("/products")
+	public boolean deleteProductsByCategoryId(@RequestParam("categoryId") int categoryId) {
 		Category category = categoryService.getCategory(categoryId);
 		return productService.deleteAllByCategory(category) > 0;
 	}

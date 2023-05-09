@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     );
 
     int deleteAllByCategory(Category cat);
+
+    List<Product> getProductsByCategory(int categoryId);
 }

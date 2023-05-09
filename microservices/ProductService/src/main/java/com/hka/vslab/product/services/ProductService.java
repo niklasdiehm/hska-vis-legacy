@@ -44,6 +44,10 @@ public class ProductService {
         }
     }
 
+    public List<Product> getProductsByCategory(int categoryId) {
+        return productRepository.getProductsByCategory(categoryId);
+    }
+
     public void addProduct(Product product) {
         productRepository.save(product);
     }
