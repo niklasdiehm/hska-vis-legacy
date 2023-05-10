@@ -19,52 +19,15 @@ services:
       - "./.data/db:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
-      MYSQL_DATABASE: webshop
       MYSQL_USER: webshopuser
-      MYSQL_PASSWORD: 240b2c6d58ff2ce2f508b49f
+      MYSQL_PASSWORD: dbPassword
     ports:
       - "3306:3306"
     networks:
         local_dev_net:
             aliases:
                 - web-shop-db-image
-    
-  web-shop-db-image-category:
-    build:
-      context: ./
-      dockerfile: ./docker/DockerfileMySQLCategory
-    volumes:
-      - "./.data/db1:/var/lib/mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
-      MYSQL_DATABASE: category
-      MYSQL_USER: categoryUser
-      MYSQL_PASSWORD: categoryPassword
-    ports:
-      - "3307:3306"
-    networks:
-        local_dev_net:
-            aliases:
-                - web-shop-db-image-category
-  
-  web-shop-db-image-product:
-    build:
-      context: ./
-      dockerfile: ./docker/DockerfileMySQLProduct
-    volumes:
-      - "./.data/db2:/var/lib/mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
-      MYSQL_DATABASE: product
-      MYSQL_USER: productUser
-      MYSQL_PASSWORD: productPassword
-    ports:
-      - "3308:3306"
-    networks:
-        local_dev_net:
-            aliases:
-                - web-shop-db-image-product
-  
+
   web-shop-microservice-category:
     build:
       context: ./microservices/CategoryService
@@ -72,7 +35,7 @@ services:
     ports:
       - "8889:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image-category:3306/category
+      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image:3306/categorydb
     networks:
       local_dev_net:
           aliases:
@@ -85,7 +48,7 @@ services:
     ports:
       - "8890:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image-product:3306/product
+      - SPRING_DATASOURCE_URL=jdbc:mysql://web-shop-db-image:3306/productdb
     networks:
       local_dev_net:
         aliases:
