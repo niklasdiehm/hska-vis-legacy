@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: category
+  name: category
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: category
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: category
+    spec:
+      containers:
+      - image: docker.io/safa1020/microservices/category:latest	
+        name: category
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: product
+  name: product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: product
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: product
+    spec:
+      containers:
+      - image: docker.io/safa1020/microservices/product:latest
+        name: product
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: category
+  name: category
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: category
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: product
+  name: product
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: product
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+
+---
+
+apiVersion: v1
+stringData: 
+  MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
+  MYSQL_USER: webshopuser
+  MYSQL_PASSWORD: dbPassword
+kind: Secret
+type: Opaque
+metadata:
+  name: mysql-pass
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql:5.6
+          name: mysql
+          env:
+            # Use secret in real usage
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom: 
+                secretKeyRef: 
+                  name: mysql-pass
+                  key: MYSQL_ROOT_PASSWORD
+                    # Use secret in real usage
+            - name: MYSQL_USER
+              valueFrom: 
+                secretKeyRef: 
+                  name: mysql-pass
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom: 
+                secretKeyRef: 
+                  name: mysql-pass
+                  key: MYSQL_PASSWORD     
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql # this must be updated
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+
+
