@@ -135,6 +135,10 @@ spec:
               value: jdbc:mysql://$(MYSQL_SERVICE_HOST):3306/categorydb
             - name: PRODUCT_RIBBON_LISTOFSERVERS
               value: $(PRODUCT_SERVICE_HOST):$(PRODUCT_SERVICE_PORT)/
+      initContainers:
+        - name: init-delay-category
+          image: busybox
+          command: ["sleep", "15"]
 status: {}
 
 ---
@@ -177,6 +181,10 @@ spec:
               value: jdbc:mysql://$(MYSQL_SERVICE_HOST):3306/productdb
             - name: CATEGORY_RIBBON_LISTOFSERVERS
               value: $(CATEGORY_SERVICE_HOST):$(CATEGORY_SERVICE_PORT)/
+      initContainers:
+        - name: init-delay-product
+          image: busybox
+          command: ["sleep", "15"]
 status: {}
 ---
 apiVersion: networking.k8s.io/v1
