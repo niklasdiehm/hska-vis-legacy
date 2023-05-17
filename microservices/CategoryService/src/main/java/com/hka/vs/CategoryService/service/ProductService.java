@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(value = "product", url = "microserviceproduct:8080/")
+@FeignClient(value = "product", url = "${product.ribbon.listOfServers}")
 public interface ProductService {
     @RequestMapping(method = RequestMethod.GET, value = "/products")
     List<Product> getProductsByCategory(@RequestParam("categoryId") int id);

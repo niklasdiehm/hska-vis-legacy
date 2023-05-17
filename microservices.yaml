@@ -1,3 +1,101 @@
+apiVersion: v1
+stringData:
+  MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
+  MYSQL_USER: webshopuser
+  MYSQL_PASSWORD: dbPassword
+kind: Secret
+type: Opaque
+metadata:
+  name: mysql-pass
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysqlwebshop
+          name: mysql
+          imagePullPolicy: IfNotPresent
+          env:
+            # Use secret in real usage
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key:
+                    MYSQL_ROOT_PASSWORD
+                    # Use secret in real usage
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: MYSQL_PASSWORD
+          ports:
+            - containerPort: 3306
+              name: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: category
+  name: category
+spec:
+  ports:
+    - port: 8889
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    run: category
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: product
+  name: product
+spec:
+  ports:
+    - port: 8888
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    run: product
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,15 +116,28 @@ spec:
         run: category
     spec:
       containers:
-      - image: docker.io/safa1020/microservices/category:latest	
-        name: category
-        ports:
-        - containerPort: 8080
-        resources: {}
+        - image: category:latest
+          name: category
+          resources: {}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: MYSQL_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: MYSQL_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://$(MYSQL_SERVICE_HOST):3306/categorydb
+            - name: PRODUCT_RIBBON_LISTOFSERVERS
+              value: $(PRODUCT_SERVICE_HOST):$(PRODUCT_SERVICE_PORT)/
 status: {}
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,123 +158,49 @@ spec:
         run: product
     spec:
       containers:
-      - image: docker.io/safa1020/microservices/product:latest
-        name: product
-        ports:
-        - containerPort: 8080
-        resources: {}
-status: {}
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    run: category
-  name: category
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    run: category
-  type: LoadBalancer
-status:
-  loadBalancer: {}
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    run: product
-  name: product
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    run: product
-  type: LoadBalancer
-status:
-  loadBalancer: {}
-
----
-
-apiVersion: v1
-stringData: 
-  MYSQL_ROOT_PASSWORD: c8de110f37300a53a971749
-  MYSQL_USER: webshopuser
-  MYSQL_PASSWORD: dbPassword
-kind: Secret
-type: Opaque
-metadata:
-  name: mysql-pass
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql
-spec:
-  ports:
-    - port: 3306
-  selector:
-    app: mysql
-  clusterIP: None
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: mysql
-spec:
-  selector:
-    matchLabels:
-      app: mysql
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: mysql
-    spec:
-      containers:
-        - image: mysql:5.6
-          name: mysql
+        - image: product:latest
+          name: product
+          resources: {}
+          imagePullPolicy: IfNotPresent
           env:
-            # Use secret in real usage
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom: 
-                secretKeyRef: 
-                  name: mysql-pass
-                  key: MYSQL_ROOT_PASSWORD
-                    # Use secret in real usage
-            - name: MYSQL_USER
-              valueFrom: 
-                secretKeyRef: 
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
                   name: mysql-pass
                   key: MYSQL_USER
-            - name: MYSQL_PASSWORD
-              valueFrom: 
-                secretKeyRef: 
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
                   name: mysql-pass
-                  key: MYSQL_PASSWORD     
-          ports:
-            - containerPort: 3306
-              name: mysql
-          volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql # this must be updated
-      volumes:
-        - name: mysql-persistent-storage
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim
-
-
+                  key: MYSQL_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://$(MYSQL_SERVICE_HOST):3306/productdb
+            - name: CATEGORY_RIBBON_LISTOFSERVERS
+              value: $(CATEGORY_SERVICE_HOST):$(CATEGORY_SERVICE_PORT)/
+status: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webshop-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /category
+            pathType: Prefix
+            backend:
+              service:
+                name: category
+                port:
+                  number: 8080
+          - path: /product
+            pathType: Prefix
+            backend:
+              service:
+                name: product
+                port:
+                  number: 8080
