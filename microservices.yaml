@@ -187,28 +187,48 @@ spec:
           command: ["sleep", "15"]
 status: {}
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: webshop-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  creationTimestamp: null
+  labels:
+    run: apache
+  name: apache
 spec:
-  ingressClassName: nginx
-  rules:
-    - http:
-        paths:
-          - path: /category
-            pathType: Prefix
-            backend:
-              service:
-                name: category
-                port:
-                  number: 8080
-          - path: /product
-            pathType: Prefix
-            backend:
-              service:
-                name: product
-                port:
-                  number: 8080
+  replicas: 1
+  selector:
+    matchLabels:
+      run: apache
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: apache
+    spec:
+      containers:
+        - image: apache:latest
+          name: apache
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: apache
+  name: apache
+spec:
+  ports:
+    - port: 8001
+      protocol: TCP
+      targetPort: 80
+  selector:
+    run: apache
+  type: LoadBalancer
+status:
+  loadBalancer: {}
