@@ -77,20 +77,21 @@ public class ProductController {
 		return productService.getProduct(id);
 	}
 
-	@GetMapping("/products/{name}")
+	@GetMapping("/products/name/{name}")
 	public Product getProductByName(@PathVariable("name") String name) {
 		return productService.getProductByName(name);
 	}
 
 	@PostMapping("/products")
-	public int addProduct(@RequestBody NewProductData newProduct) throws RuntimeException{
+	public int addProduct(@RequestBody NewProductData newProduct) throws RuntimeException {
 		Category category = categoryService.getCategory(newProduct.getCategoryId());
 
 		if (category == null) {
 			throw new RuntimeException("Category not found");
 		}
 
-		Product product = new Product(newProduct.getName(), newProduct.getPrice(), newProduct.getCategoryId(), newProduct.getDetails());
+		Product product = new Product(newProduct.getName(), newProduct.getPrice(), newProduct.getCategoryId(),
+				newProduct.getDetails());
 		productService.addProduct(product);
 		int productId = product.getId();
 
@@ -101,8 +102,7 @@ public class ProductController {
 	public List<Product> getProductsForSearchValues(
 			@RequestParam("searchString") String searchValue,
 			@RequestParam("minPrice") Double searchMinPrice,
-			@RequestParam("maxPrice") Double searchMaxPrice
-	) {
+			@RequestParam("maxPrice") Double searchMaxPrice) {
 		return productService.findProductsBySearch(searchValue, searchMinPrice, searchMaxPrice);
 	}
 
