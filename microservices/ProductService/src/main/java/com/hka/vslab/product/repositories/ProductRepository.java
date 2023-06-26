@@ -10,13 +10,13 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     Product findByName(String name);
+
     void deleteByName(String name);
 
     List<Product> findProductsByDetailsLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(
-            String search, Double minPrice, Double maxPrice
-    );
+            String search, Double minPrice, Double maxPrice);
 
-    int deleteAllByCategory(Category cat);
+    int deleteAllByCategoryId(Category cat);
 
-    List<Product> getProductsByCategory(int categoryId);
+    List<Product> getProductsByCategoryId(int categoryId);
 }

@@ -7,27 +7,30 @@ import com.hka.vslab.product.model.Product;
 import com.hka.vslab.product.model.Category;
 import com.hka.vslab.product.services.CategoryService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 
 import javax.management.RuntimeErrorException;
 
 class NewProductData {
 	private String name;
-	private Double price;
+	private double price;
 	private String details;
 	private int categoryId;
 
 	public NewProductData() {
 	}
 
-	public NewProductData(String name, Double price, int categoryId) {
+	public NewProductData(String name, double price, int categoryId) {
 		this.name = name;
 		this.price = price;
 		this.details = null;
 		this.categoryId = categoryId;
 	}
 
-	public NewProductData(String name, Double price, String details, int categoryId) {
+	public NewProductData(String name, double price, String details, int categoryId) {
 		this.name = name;
 		this.price = price;
 		this.details = details;
@@ -38,7 +41,7 @@ class NewProductData {
 		return name;
 	}
 
-	public Double getPrice() {
+	public double getPrice() {
 		return price;
 	}
 
@@ -83,7 +86,7 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public int addProduct(@RequestBody NewProductData newProduct) throws RuntimeException {
+	public ResponseEntity<Object> addProduct(@RequestBody NewProductData newProduct) throws RuntimeException {
 		Category category = categoryService.getCategory(newProduct.getCategoryId());
 
 		if (category == null) {
@@ -94,15 +97,14 @@ public class ProductController {
 				newProduct.getDetails());
 		productService.addProduct(product);
 		int productId = product.getId();
-
-		return productId;
+		return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/products/search")
 	public List<Product> getProductsForSearchValues(
 			@RequestParam("searchString") String searchValue,
-			@RequestParam("minPrice") Double searchMinPrice,
-			@RequestParam("maxPrice") Double searchMaxPrice) {
+			@RequestParam("minPrice") double searchMinPrice,
+			@RequestParam("maxPrice") double searchMaxPrice) {
 		return productService.findProductsBySearch(searchValue, searchMinPrice, searchMaxPrice);
 	}
 

@@ -38,14 +38,15 @@ public class ProductService {
 
     public List<Product> findProductsBySearch(String search, Double minPrice, Double maxPrice) {
         try {
-            return productRepository.findProductsByDetailsLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(search, minPrice, maxPrice);
+            return productRepository.findProductsByDetailsLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(search,
+                    minPrice, maxPrice);
         } catch (NoSuchElementException e) {
             return null;
         }
     }
 
     public List<Product> getProductsByCategory(int categoryId) {
-        return productRepository.getProductsByCategory(categoryId);
+        return productRepository.getProductsByCategoryId(categoryId);
     }
 
     public void addProduct(Product product) {
@@ -62,6 +63,6 @@ public class ProductService {
     }
 
     public int deleteAllByCategory(Category cat) {
-        return productRepository.deleteAllByCategory(cat);
+        return productRepository.deleteAllByCategoryId(cat);
     }
 }

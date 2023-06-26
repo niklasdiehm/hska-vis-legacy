@@ -187,7 +187,7 @@ spec:
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-pass
+                  name: configmap
                   key: MYSQL_USER
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:

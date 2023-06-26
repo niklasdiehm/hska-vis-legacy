@@ -1,6 +1,5 @@
 package com.hka.vslab.product.model;
 
-
 import jakarta.persistence.*;
 
 /**
@@ -26,10 +25,9 @@ public class Product implements java.io.Serializable {
 	@Column(name = "price")
 	private double price;
 
-
 	// @ManyToOne
 	// @JoinColumn(name = "category_id")
-	private int category;
+	private int categoryId;
 
 	@Column(name = "details")
 	private String details;
@@ -37,16 +35,16 @@ public class Product implements java.io.Serializable {
 	public Product() {
 	}
 
-	public Product(String name, double price, int category) {
+	public Product(String name, double price, int categoryId) {
 		this.name = name;
 		this.price = price;
-		this.category = category;
+		this.categoryId = categoryId;
 	}
 
-	public Product(String name, double price, int category, String details) {
+	public Product(String name, double price, int categoryId, String details) {
 		this.name = name;
 		this.price = price;
-		this.category = category;
+		this.categoryId = categoryId;
 		this.details = details;
 	}
 
@@ -74,12 +72,12 @@ public class Product implements java.io.Serializable {
 		this.price = price;
 	}
 
-	public int getCategory() {
-		return this.category;
+	public int getCategoryId() {
+		return this.categoryId;
 	}
 
-	public void setCategory(int category) {
-		this.category = category;
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	public String getDetails() {
