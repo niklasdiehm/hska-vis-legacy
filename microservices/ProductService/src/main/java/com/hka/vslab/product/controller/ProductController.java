@@ -102,9 +102,9 @@ public class ProductController {
 
 	@GetMapping("/products/search")
 	public List<Product> getProductsForSearchValues(
-			@RequestParam("searchString") String searchValue,
-			@RequestParam("minPrice") double searchMinPrice,
-			@RequestParam("maxPrice") double searchMaxPrice) {
+			@RequestParam(name = "searchString", required = false) String searchValue,
+			@RequestParam(name = "minPrice", required = false) Double searchMinPrice,
+			@RequestParam(name = "maxPrice", required = false) Double searchMaxPrice) {
 		return productService.findProductsBySearch(searchValue, searchMinPrice, searchMaxPrice);
 	}
 
