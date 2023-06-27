@@ -31,15 +31,15 @@ public class ProductManagerImpl implements ProductManager {
 
 		Map<String, Object> queryMap = new HashMap<String, Object>();
 		if (searchDescription != null) {
-			queryMap.put("search", searchDescription);
+			queryMap.put("searchString", searchDescription);
 		}
 
 		if (searchMinPrice != null) {
-			queryMap.put("minimumPrice", searchMinPrice);
+			queryMap.put("minPrice", searchMinPrice);
 		}
 
 		if (searchMaxPrice != null) {
-			queryMap.put("maximumPrice", searchMaxPrice);
+			queryMap.put("maxPrice", searchMaxPrice);
 		}
 
 		return productClient.search(queryMap);

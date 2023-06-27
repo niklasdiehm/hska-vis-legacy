@@ -13,8 +13,16 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     void deleteByName(String name);
 
-    List<Product> findProductsByDetailsLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(
+    List<Product> findProductsByNameLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(
             String search, Double minPrice, Double maxPrice);
+
+    List<Product> findProductsByNameLike(String search);
+
+    List<Product> findProductsByNameLikeAndPriceLessThanEqual(
+            String search, Double maxPrice);
+
+    List<Product> findProductsByNameLikeAndPriceGreaterThanEqual(
+            String search, Double minPrice);
 
     int deleteAllByCategoryId(Category cat);
 

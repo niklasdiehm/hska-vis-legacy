@@ -37,9 +37,19 @@ public class ProductService {
     }
 
     public List<Product> findProductsBySearch(String search, Double minPrice, Double maxPrice) {
+        if (search == null)
+            search = "";
+        search = "%" + search + "%";
         try {
-            return productRepository.findProductsByDetailsLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(search,
-                    minPrice, maxPrice);
+            if (minPrice == null && maxPrice == null)
+                return productRepository.findProductsByNameLike(search);
+            else if (minPrice == null)
+                return productRepository.findProductsByNameLikeAndPriceLessThanEqual(search, maxPrice);
+            else if (maxPrice == null)
+                return productRepository.findProductsByNameLikeAndPriceGreaterThanEqual(search, minPrice);
+            else
+                return productRepository.findProductsByNameLikeAndPriceGreaterThanEqualAndPriceLessThanEqual(search,
+                        minPrice, maxPrice);
         } catch (NoSuchElementException e) {
             return null;
         }
